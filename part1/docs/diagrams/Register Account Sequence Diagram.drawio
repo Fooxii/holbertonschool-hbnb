@@ -1,0 +1,78 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0" version="29.3.4">
+  <diagram id="-Es8ymOZ9D__0lIGjusn" name="Page-1">
+    <mxGraphModel dx="575" dy="844" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" value="User" vertex="1">
+          <mxGeometry height="608" width="150" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" value="Presentation Layer" vertex="1">
+          <mxGeometry height="608" width="157" x="240" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" value="Business Logic Layer" vertex="1">
+          <mxGeometry height="608" width="167" x="533" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;fillColor=#F2CC8F;strokeColor=#E07A5F;fontColor=#393C56;" value="Persistence Layer" vertex="1">
+          <mxGeometry height="608" width="150" x="750" as="geometry" />
+        </mxCell>
+        <mxCell id="6" edge="1" parent="1" source="2" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;strokeColor=#E07A5F;fontColor=default;" target="3" value="Register New Account">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="205" y="111" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="7" edge="1" parent="1" source="3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;strokeColor=#E07A5F;fontColor=default;" target="4" value="Validate Input">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="476" y="167" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8" edge="1" parent="1" source="4" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;strokeColor=#E07A5F;fontColor=default;" target="3" value="Input Validated">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="479" y="223" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9" edge="1" parent="1" source="3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;strokeColor=#E07A5F;fontColor=default;" target="4" value="Create Account">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="476" y="279" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="10" edge="1" parent="1" source="4" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;strokeColor=#E07A5F;fontColor=default;" target="5" value="Save User Data">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="729" y="335" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="11" edge="1" parent="1" source="5" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;strokeColor=#E07A5F;fontColor=default;" target="4" value="User Data Saved">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="732" y="391" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12" edge="1" parent="1" source="4" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;strokeColor=#E07A5F;fontColor=default;" target="3" value="Account Created Confirmation">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="479" y="447" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="13" edge="1" parent="1" source="3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;sketch=1;curveFitting=1;jiggle=2;labelBackgroundColor=none;strokeColor=#E07A5F;fontColor=default;" target="2" value="Registration Successful">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="208" y="503" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
