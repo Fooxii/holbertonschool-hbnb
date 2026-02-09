@@ -130,3 +130,7 @@ class Place:
             raise TypeError("owner must be a User instance")
         self._owner = value
         self._touch()
+
+
+    def _touch(self):
+        self._updated_at = datetime.now()
