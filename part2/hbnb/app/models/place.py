@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
-from user import User
+from app.models.user import User
+
 
 
 class Place:
@@ -16,8 +17,6 @@ class Place:
         self._owner = None
         self._reviews = []
         self._amenities = []
-
-
 
         self.title = title
         self.description = description
@@ -141,11 +140,14 @@ class Place:
     def reviews(self):
         return self._reviews
 
+
     def add_review(self, review):
-        from review import Review
+        from app.models.review import Review
         if not isinstance(review, Review):
             raise TypeError("review must be an instance of the Review class")
-        self._reviews.append(review)
+        if review not in self._reviews:
+            self._reviews.append(review)
+            self._touch()
 
 
     @property
@@ -153,7 +155,7 @@ class Place:
         return self._amenities
 
     def add_amenities(self, amenity):
-        from amenity import Amenity
+        from app.models.amenity import Amenity
         if not isinstance(amenity, Amenity):
             raise TypeError("amenity muse be an instance of the Amenity class")
         if amenity not in self._amenities:

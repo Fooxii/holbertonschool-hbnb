@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 class User:
-    def __init__(self, id, first_name, last_name, email, is_admin=False):
+    def __init__(self, first_name, last_name, email, is_admin=False):
         self._id = str(uuid.uuid4())
         self._created_at = datetime.now()
         self._updated_at = datetime.now()
@@ -15,9 +15,6 @@ class User:
         self._places = []
         self._reviews = []
 
-
-
-        self.id = id
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
@@ -108,7 +105,7 @@ class User:
         return self._places
 
     def add_place(self, place):
-        from place import Place
+        from app.models.place import Place
         if not isinstance(place, Place):
             raise TypeError("place must be an instance of the Place class")
         self._places.append(place)
@@ -119,10 +116,11 @@ class User:
         return self._reviews
 
     def add_review(self, review):
-        from review import Review
+        from app.models.review import Review
         if not isinstance(review, Review):
             raise TypeError("review must be an instance of the Review class")
-        self._reviews.append(review)
+        if review not in self._reviews:
+            self._reviews.append(review)
 
 
     def _touch(self):

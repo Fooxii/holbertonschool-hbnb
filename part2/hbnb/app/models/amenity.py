@@ -10,7 +10,6 @@ class Amenity:
         self._name = None
         self._places = []
 
-
         self.name = name
 
 
@@ -56,7 +55,7 @@ class Amenity:
         return self._places
 
     def add_place(self, place):
-        from place import Place
+        from app.models.place import Place
         if not isinstance(place, Place):
             raise TypeError("place must be an instance of the Place class")
         if place not in self._places:
