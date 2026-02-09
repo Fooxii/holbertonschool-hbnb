@@ -45,10 +45,12 @@ class User:
 
     @first_name.setter
     def first_name(self, value):
-        if not isinstance(value, str) or len(value) == 0:
+        if not isinstance(value, str):
             raise TypeError("first_name must be a string")
         if len(value) > 50:
             raise ValueError("first_name must be less than 50 characters long")
+        if len(value.strip()) == 0:
+            raise ValueError("first_name is required")
         self._first_name = value
         self._touch()
 
@@ -63,6 +65,8 @@ class User:
             raise TypeError("last_name must be a string")
         if len(value) > 50:
             raise ValueError("last_name must be less than 50 characters long")
+        if len(value.strip()) == 0:
+            raise ValueError("last_name is required")
         self._last_name = value
         self._touch()
 
@@ -77,6 +81,8 @@ class User:
             raise TypeError("email must be a string")
         if not self._valid_email(value):
             raise ValueError("Invalid email format")
+        if len(value.strip()) == 0:
+            raise ValueError("email is required")
         self._email = value
         self._touch()
 
