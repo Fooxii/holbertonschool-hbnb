@@ -78,6 +78,7 @@ class Review:
         if not isinstance(value, Place):
             raise TypeError("place must be an instance of the Place class")
         self._place = value
+        value.add_review(self)
         self._touch()
 
 
@@ -90,6 +91,7 @@ class Review:
         if not isinstance(value, User):
             raise TypeError("user must be an instance of the User class")
         self._user = value
+        value.add_review(self)
         self._touch()
 
 

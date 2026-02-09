@@ -14,6 +14,10 @@ class Place:
         self._latitude = None
         self._longitude = None
         self._owner = None
+        self._reviews = []
+        self._amenities = []
+
+
 
         self.title = title
         self.description = description
@@ -129,7 +133,32 @@ class Place:
         if not isinstance(value, User):
             raise TypeError("owner must be a User instance")
         self._owner = value
+        value.add_place(self)
         self._touch()
+
+
+    @property
+    def reviews(self):
+        return self._reviews
+
+    def add_review(self, review):
+        from review import Review
+        if not isinstance(review, Review):
+            raise TypeError("review must be an instance of the Review class")
+        self._reviews.append(review)
+
+
+    @property
+    def amenities(self):
+        return self._amenities
+
+    def add_amenities(self, amenity):
+        from amenity import Amenity
+        if not isinstance(amenity, Amenity):
+            raise TypeError("amenity muse be an instance of the Amenity class")
+        if amenity not in self._amenities:
+            self._amenities.append(amenity)
+            amenity.add_place(self)
 
 
     def _touch(self):

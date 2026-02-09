@@ -12,6 +12,10 @@ class User:
         self._last_name = None
         self._email = None
         self._is_admin = is_admin
+        self._places = []
+        self._reviews = []
+
+
 
         self.id = id
         self.first_name = first_name
@@ -97,6 +101,28 @@ class User:
             raise TypeError("is_admin must be a boolean")
         self._is_admin = value
         self._touch()
+
+
+    @property
+    def places(self):
+        return self._places
+
+    def add_place(self, place):
+        from place import Place
+        if not isinstance(place, Place):
+            raise TypeError("place must be an instance of the Place class")
+        self._places.append(place)
+
+
+    @property
+    def reviews(self):
+        return self._reviews
+
+    def add_review(self, review):
+        from review import Review
+        if not isinstance(review, Review):
+            raise TypeError("review must be an instance of the Review class")
+        self._reviews.append(review)
 
 
     def _touch(self):
