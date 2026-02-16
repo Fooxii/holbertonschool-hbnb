@@ -19,8 +19,8 @@ class Amenity:
 
     @id.setter
     def id(self, value):
-        if not isinstance(value, str) or len(value) == 0:
-            raise TypeError("id must be a string")
+        if not isinstance(value, str) or len(value.strip()) == 0:
+            raise TypeError("id must be a non-empty string")
         self._id = value
         self._touch()
 
@@ -42,10 +42,12 @@ class Amenity:
     def name(self, value):
         if not isinstance(value, str):
             raise TypeError("name must be a string")
-        if len(value.strip()) == 0:
+        value = value.strip()
+        if not value:
             raise ValueError("name is required")
         if len(value) > 50:
             raise ValueError("name must be less than 50 characters long")
+
         self._name = value
         self._touch()
 
@@ -60,7 +62,14 @@ class Amenity:
             raise TypeError("place must be an instance of the Place class")
         if place not in self._places:
             self._places.append(place)
+            self._touch
 
 
     def _touch(self):
         self._updated_at = datetime.now()
+
+    def update(self, data: dict):
+        allowed_fields = ['name']
+        for key, value in data.items():
+            if key in allowed_fields:
+                setattr(self, key, value)

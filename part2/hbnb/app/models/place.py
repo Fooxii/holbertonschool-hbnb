@@ -157,7 +157,7 @@ class Place:
     def add_amenities(self, amenity):
         from app.models.amenity import Amenity
         if not isinstance(amenity, Amenity):
-            raise TypeError("amenity muse be an instance of the Amenity class")
+            raise TypeError("amenity must be an instance of the Amenity class")
         if amenity not in self._amenities:
             self._amenities.append(amenity)
             amenity.add_place(self)
@@ -165,3 +165,14 @@ class Place:
 
     def _touch(self):
         self._updated_at = datetime.now()
+
+    def update(self, data: dict):
+        allowed_fields = ['title', 'description', 'price', 'latitude', 'longitude', 'owner', 'amenities']
+        for key, value in data.items():
+            if key in allowed_fields:
+                if key == 'amenities':
+                    self._amenities = []
+                    for amenity in value:
+                        self.add_amenities(amenity)
+                else:
+                    setattr(self, key, value)

@@ -129,3 +129,9 @@ class User:
     def _valid_email(self, email):
         pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
         return re.match(pattern, email)
+
+    def update(self, data: dict):
+        allowed_fields = ['first_name', 'last_name', 'email', 'is_admin']
+        for key, value in data.items():
+            if key in allowed_fields:
+                setattr(self, key, value)

@@ -102,3 +102,9 @@ class Review:
 
     def _touch(self):
         self._updated_at = datetime.now()
+
+    def update(self, data: dict):
+        allowed_fields = ['text', 'rating', 'place', 'user']
+        for key, value in data.items():
+            if key in allowed_fields:
+                setattr(self, key, value)
