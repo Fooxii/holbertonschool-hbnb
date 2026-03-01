@@ -13,7 +13,18 @@ class HBnBFacade:
 
 
     def create_user(self, user_data):
-        user = User(**user_data)
+        password = user_data.pop("password", None)
+
+        if not password:
+            raise ValueError("Password is required")
+
+        user = User(
+            first_name=user_data["first_name"],
+            last_name=user_data["last_name"],
+            email=user_data["email"]
+        )
+
+        user.hash_password(password)
         self.user_repo.add(user)
         return user
 

@@ -1,5 +1,6 @@
 import uuid
 import re
+from app import bcrypt
 from datetime import datetime
 
 
@@ -14,6 +15,7 @@ class User:
         self._is_admin = is_admin
         self._places = []
         self._reviews = []
+        self._password = None
 
         self.first_name = first_name
         self.last_name = last_name
@@ -122,6 +124,17 @@ class User:
         if review not in self._reviews:
             self._reviews.append(review)
 
+    @property
+    def password(self):
+        return self._password
+
+    def hash_password(self, password):
+        if not isinstance(password, str) or len(password.strip()) == 0:
+            raise ValueError("Password must be a non-empty string")
+
+        self._password = bcrypt.generate_password_hash(password).decode('utf-8')
+        self._touch()
+
 
     def _touch(self):
         self._updated_at = datetime.now()
@@ -133,5 +146,12 @@ class User:
     def update(self, data: dict):
         allowed_fields = ['first_name', 'last_name', 'email', 'is_admin']
         for key, value in data.items():
-            if key in allowed_fields:
+            if key == "password":
+                self.hash_password(value)
+            elif key in allowed_fields:
                 setattr(self, key, value)
+
+    def verify_password(self, password):
+        if self._password is None:
+            return False
+        return bcrypt.check_password_hash(self._password, password)
