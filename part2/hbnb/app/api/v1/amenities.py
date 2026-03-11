@@ -54,20 +54,20 @@ class AmenityResource(Resource):
         return {'id': amenity.id, 'name': amenity.name}, 200
 
 
-@api.expect(amenity_model)
-@api.response(200, 'Amenity updated successfully')
-@api.response(404, 'Amenity not found')
-@api.response(400, 'Invalid input data')
-@jwt_required()
-def put(self, amenity_id):
-    """Update an amenity's information"""
-    if not admin_required():
-        return {'error': 'Admin privileges required'}, 403
-    try:
-        updated = facade.update_amenity(amenity_id, api.payload)
-        if not updated:
-            return {'error': 'Amenity not found'}, 404
+    @api.expect(amenity_model)
+    @api.response(200, 'Amenity updated successfully')
+    @api.response(404, 'Amenity not found')
+    @api.response(400, 'Invalid input data')
+    @jwt_required()
+    def put(self, amenity_id):
+        """Update an amenity's information"""
+        if not admin_required():
+            return {'error': 'Admin privileges required'}, 403
+        try:
+            updated = facade.update_amenity(amenity_id, api.payload)
+            if not updated:
+                return {'error': 'Amenity not found'}, 404
 
-        return {'id': updated.id, 'name': updated.name}, 200
-    except ValueError:
-        return {'error': 'Invalid input data'}, 400
+            return {'id': updated.id, 'name': updated.name}, 200
+        except ValueError:
+            return {'error': 'Invalid input data'}, 400

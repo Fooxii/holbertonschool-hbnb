@@ -24,13 +24,28 @@ class ReviewList(Resource):
     @jwt_required()
     def post(self):
         """Register a new review"""
-        user_id = get_jwt_identity()
 
+        user_id = get_jwt_identity()
         data = api.payload
+
         data["user_id"] = user_id
+
+        place = facade.get_place(data["place_id"])
+
+        if not place:
+            return {"error": "Place not found"}, 404
+
+        if place.owner.id == user_id:
+            return {"error": "You cannot review your own place"}, 400
+
+        existing = facade.get_review_by_user_and_place(user_id, data["place_id"])
+
+        if existing:
+            return {"error": "You have already reviewed this place"}, 400
+
         try:
-            review = facade.create_review(api.payload)
-            # Return the created review as JSON with HTTP 201
+            review = facade.create_review(data)
+
             return {
                 'id': review.id,
                 'text': review.text,
@@ -38,9 +53,8 @@ class ReviewList(Resource):
                 'user_id': review.user.id,
                 'place_id': review.place.id
             }, 201
-        except ValueError as e:
-            if str(e) == "Invalid user or place":
-                return {'error': 'User or place not found'}, 404
+
+        except ValueError:
             return {'error': 'Invalid input data'}, 400
 
 
@@ -95,7 +109,7 @@ class ReviewResource(Resource):
         current_user = get_jwt_identity()
 
         if review.user.id != current_user and not admin_required():
-            return {"error": "Not authorized"}, 403
+            return {"error": "Unauthorized action"}, 403
         try:
             updated = facade.update_review(review_id, api.payload)
             if not updated:
@@ -119,7 +133,7 @@ class ReviewResource(Resource):
         current_user = get_jwt_identity()
 
         if review.user.id != current_user and not admin_required():
-            return {"error": "Not authorized"}, 403
+            return {"error": "Unauthorized action"}, 403
         deleted = facade.delete_review(review_id)
         if not deleted:
             return {'error': 'Review not found'}, 404

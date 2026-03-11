@@ -22,7 +22,10 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
+        if not is_admin():
+            return {'error': 'Admin privileges required'}, 403
         """Register a new user"""
         user_data = api.payload
 
@@ -86,3 +89,29 @@ class UserResource(Resource):
             'last_name': user.last_name,
             'email': user.email
         }, 200
+
+
+    @api.expect(user_model)
+    @api.response(200, 'User updated successfully')
+    @api.response(403, 'Unauthorized action')
+    @api.response(400, 'You cannot modify email or password')
+    @jwt_required()
+    def put(self, user_id):
+
+        current_user = get_jwt_identity()
+
+        if current_user != user_id and not is_admin():
+            return {"error": "Unauthorized action"}, 403
+
+        data = api.payload
+
+        if not is_admin():
+            if "email" in data or "password" in data:
+                return {"error": "You cannot modify email or password"}, 400
+
+        updated = facade.update_user(user_id, data)
+
+        if not updated:
+            return {"error": "User not found"}, 404
+
+        return {"id": updated.id}, 200

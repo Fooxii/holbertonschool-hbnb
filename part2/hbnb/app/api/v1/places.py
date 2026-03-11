@@ -1,6 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
-from flask_jwt_extended import jwt_required, get_jwt
+from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 
 api = Namespace('places', description='Place operations')
 
@@ -40,10 +40,13 @@ class PlaceList(Resource):
     @jwt_required()
     def post(self):
         """Register a new place"""
-        if not admin_required():
-            return {'error': 'Admin privileges required'}, 403
+        current_user = get_jwt_identity()
+
+        data = api.payload
+        data["owner_id"] = current_user
+
         try:
-            place = facade.create_place(api.payload)
+            place = facade.create_place(data)
             return {'id': place.id}, 201
         except (ValueError, TypeError):
             return {'error': 'Invalid input data'}, 400
@@ -103,13 +106,19 @@ class PlaceResource(Resource):
     @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
-        if not admin_required():
-            return {'error': 'Admin privileges required'}, 403
+
+        place = facade.get_place(place_id)
+
+        if not place:
+            return {'error': 'Place not found'}, 404
+
+        current_user = get_jwt_identity()
+
+        if place.owner.id != current_user and not admin_required():
+            return {'error': 'Unauthorized action'}, 403
+
         try:
             updated = facade.update_place(place_id, api.payload)
-            if not updated:
-                return {'error': 'Place not found'}, 404
-
             return {'id': updated.id}, 200
         except ValueError:
             return {'error': 'Invalid input data'}, 400
@@ -119,11 +128,22 @@ class PlaceResource(Resource):
     @api.response(404, 'Place not found')
     @jwt_required()
     def delete(self, place_id):
-        if not admin_required():
-            return {'error': 'Admin privileges required'}, 403
+
+        place = facade.get_place(place_id)
+
+        if not place:
+            return {'error': 'Place not found'}, 404
+
+        current_user = get_jwt_identity()
+
+        if place.owner.id != current_user and not admin_required():
+            return {'error': 'Unauthorized action'}, 403
+
         deleted = facade.delete_place(place_id)
+
         if not deleted:
             return {'error': 'Place not found'}, 404
+
         return {'message': 'Place deleted successfully'}, 200
 
 
