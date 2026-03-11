@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from flask_jwt_extended import jwt_required, get_jwt
 
 api = Namespace('places', description='Place operations')
 
@@ -27,13 +28,20 @@ place_model = api.model('Place', {
     'amenities': fields.List(fields.String, required=True, description="List of amenities ID's")
 })
 
+def admin_required():
+    claims = get_jwt()
+    return claims.get("is_admin", False)
+
 @api.route('/')
 class PlaceList(Resource):
     @api.expect(place_model)
     @api.response(201, 'Place successfully created')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def post(self):
         """Register a new place"""
+        if not admin_required():
+            return {'error': 'Admin privileges required'}, 403
         try:
             place = facade.create_place(api.payload)
             return {'id': place.id}, 201
@@ -92,8 +100,11 @@ class PlaceResource(Resource):
     @api.response(200, 'Place updated successfully')
     @api.response(404, 'Place not found')
     @api.response(400, 'Invalid input data')
+    @jwt_required()
     def put(self, place_id):
         """Update a place's information"""
+        if not admin_required():
+            return {'error': 'Admin privileges required'}, 403
         try:
             updated = facade.update_place(place_id, api.payload)
             if not updated:
@@ -106,7 +117,10 @@ class PlaceResource(Resource):
 
     @api.response(200, 'Place deleted successfully')
     @api.response(404, 'Place not found')
+    @jwt_required()
     def delete(self, place_id):
+        if not admin_required():
+            return {'error': 'Admin privileges required'}, 403
         deleted = facade.delete_place(place_id)
         if not deleted:
             return {'error': 'Place not found'}, 404

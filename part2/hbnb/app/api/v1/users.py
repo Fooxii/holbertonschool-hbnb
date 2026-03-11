@@ -1,5 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 api = Namespace('users', description='User operations')
 
@@ -10,6 +11,10 @@ user_model = api.model('User', {
     'email': fields.String(required=True, description='Email of the user'),
     'password': fields.String(required=True, description='Password of the user')
 })
+
+def is_admin():
+    claims = get_jwt()
+    return claims.get("is_admin", False)
 
 @api.route('/')
 class UserList(Resource):
@@ -43,8 +48,11 @@ class UserList(Resource):
 
 
     @api.response(200, 'List of users retrieved successfully')
+    @jwt_required()
     def get(self):
         """Retrieve all users"""
+        if not is_admin():
+            return {'error': 'Admin privileges required'}, 403
         users = facade.get_all_users()
         return [
             {
@@ -66,6 +74,11 @@ class UserResource(Resource):
         user = facade.get_user(user_id)
         if not user:
             return {'error': 'User not found'}, 404
+
+        current_user_id = get_jwt_identity()
+
+        if current_user_id != user_id and not is_admin():
+            return {'error': 'Unauthorized'}, 403
 
         return {
             'id': user.id,
