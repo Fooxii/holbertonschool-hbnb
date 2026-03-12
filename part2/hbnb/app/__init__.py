@@ -3,11 +3,13 @@ from flask_restx import Api
 from config import config
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
 
 bcrypt = Bcrypt()
 jwt = JWTManager()
+db = SQLAlchemy()
 
-def create_app(config_name='default'):
+def create_app(config_class=config.DevelopmentConfig):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     app.config["JWT_SECRET_KEY"] = app.config["SECRET_KEY"]
@@ -15,6 +17,7 @@ def create_app(config_name='default'):
 
     bcrypt.init_app(app)
     jwt.init_app(app)
+    db.init_app(app)
 
     api = Api(
         app,
