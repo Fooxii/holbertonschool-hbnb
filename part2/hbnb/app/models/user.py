@@ -1,157 +1,86 @@
-import uuid
 import re
-from app import bcrypt
-from datetime import datetime
+from app import db, bcrypt
+from .baseclass import BaseModel
+from sqlalchemy.orm import validates
 
 
-class User:
-    def __init__(self, first_name, last_name, email, is_admin=False):
-        self._id = str(uuid.uuid4())
-        self._created_at = datetime.now()
-        self._updated_at = datetime.now()
-        self._first_name = None
-        self._last_name = None
-        self._email = None
-        self._is_admin = is_admin
-        self._places = []
-        self._reviews = []
-        self._password = None
+class User(BaseModel):
+    __tablename__ = "users"
 
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), nullable=False, unique=True)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
+    def __init__(self, first_name, last_name, email, password=None, is_admin=False):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
+        self.is_admin = is_admin
 
-    @property
-    def id(self):
-        return self._id
+        if password:
+            self.hash_password(password)
 
-    @id.setter
-    def id(self, value):
-        if not isinstance(value, str) or len(value) == 0:
-            raise TypeError("id must be a string")
-        self._id = value
-        self._touch()
+    # ---------- VALIDATION ----------
 
-
-    @property
-    def created_at(self):
-        return self._created_at
-
-    @property
-    def updated_at(self):
-        return self._updated_at
-
-
-    @property
-    def first_name(self):
-        return self._first_name
-
-    @first_name.setter
-    def first_name(self, value):
+    @validates("first_name")
+    def validate_first_name(self, key, value):
         if not isinstance(value, str):
             raise TypeError("first_name must be a string")
-        if len(value) > 50:
-            raise ValueError("first_name must be less than 50 characters long")
         if len(value.strip()) == 0:
             raise ValueError("first_name is required")
-        self._first_name = value
-        self._touch()
-
-
-    @property
-    def last_name(self):
-        return self._last_name
-
-    @last_name.setter
-    def last_name(self, value):
-        if not isinstance(value, str) or len(value) == 0:
-            raise TypeError("last_name must be a string")
         if len(value) > 50:
-            raise ValueError("last_name must be less than 50 characters long")
+            raise ValueError("first_name must be less than 50 characters long")
+        return value
+
+    @validates("last_name")
+    def validate_last_name(self, key, value):
+        if not isinstance(value, str):
+            raise TypeError("last_name must be a string")
         if len(value.strip()) == 0:
             raise ValueError("last_name is required")
-        self._last_name = value
-        self._touch()
+        if len(value) > 50:
+            raise ValueError("last_name must be less than 50 characters long")
+        return value
 
-
-    @property
-    def email(self):
-        return self._email
-
-    @email.setter
-    def email(self, value):
-        if not isinstance(value, str) or len(value) == 0:
+    @validates("email")
+    def validate_email(self, key, value):
+        if not isinstance(value, str):
             raise TypeError("email must be a string")
-        if not self._valid_email(value):
-            raise ValueError("Invalid email format")
         if len(value.strip()) == 0:
             raise ValueError("email is required")
-        self._email = value
-        self._touch()
 
+        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        if not re.match(pattern, value):
+            raise ValueError("Invalid email format")
 
-    @property
-    def is_admin(self):
-        return self._is_admin
+        return value
 
-    @is_admin.setter
-    def is_admin(self, value):
+    @validates("is_admin")
+    def validate_is_admin(self, key, value):
         if not isinstance(value, bool):
             raise TypeError("is_admin must be a boolean")
-        self._is_admin = value
-        self._touch()
+        return value
 
-
-    @property
-    def places(self):
-        return self._places
-
-    def add_place(self, place):
-        from app.models.place import Place
-        if not isinstance(place, Place):
-            raise TypeError("place must be an instance of the Place class")
-        self._places.append(place)
-
-
-    @property
-    def reviews(self):
-        return self._reviews
-
-    def add_review(self, review):
-        from app.models.review import Review
-        if not isinstance(review, Review):
-            raise TypeError("review must be an instance of the Review class")
-        if review not in self._reviews:
-            self._reviews.append(review)
-
-    @property
-    def password(self):
-        return self._password
+    # ---------- PASSWORD ----------
 
     def hash_password(self, password):
         if not isinstance(password, str) or len(password.strip()) == 0:
             raise ValueError("Password must be a non-empty string")
 
-        self._password = bcrypt.generate_password_hash(password).decode('utf-8')
-        self._touch()
+        self.password = bcrypt.generate_password_hash(password).decode("utf-8")
 
+    def verify_password(self, password):
+        return bcrypt.check_password_hash(self.password, password)
 
-    def _touch(self):
-        self._updated_at = datetime.now()
-
-    def _valid_email(self, email):
-        pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
-        return re.match(pattern, email)
+    # ---------- UPDATE ----------
 
     def update(self, data: dict):
-        allowed_fields = ['first_name', 'last_name', 'email', 'is_admin']
+        allowed_fields = ["first_name", "last_name", "email", "is_admin"]
+
         for key, value in data.items():
             if key == "password":
                 self.hash_password(value)
             elif key in allowed_fields:
                 setattr(self, key, value)
-
-    def verify_password(self, password):
-        if self._password is None:
-            return False
-        return bcrypt.check_password_hash(self._password, password)

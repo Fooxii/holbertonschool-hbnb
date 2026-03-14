@@ -22,10 +22,7 @@ class UserList(Resource):
     @api.response(201, 'User successfully created')
     @api.response(400, 'Email already registered')
     @api.response(400, 'Invalid input data')
-    @jwt_required()
     def post(self):
-        if not is_admin():
-            return {'error': 'Admin privileges required'}, 403
         """Register a new user"""
         user_data = api.payload
 
@@ -72,6 +69,7 @@ class UserResource(Resource):
 
     @api.response(200, 'User details retrieved successfully')
     @api.response(404, 'User not found')
+    @jwt_required()
     def get(self, user_id):
         """Get user details by ID"""
         user = facade.get_user(user_id)
