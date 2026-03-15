@@ -1,75 +1,31 @@
-import uuid
-from datetime import datetime
+from app import db
+from .baseclass import BaseModel
+from sqlalchemy.orm import validates
 
 
-class Amenity:
+class Amenity(BaseModel):
+    __tablename__ = "amenities"
+
+    name = db.Column(db.String(100), nullable=False)
+
     def __init__(self, name):
-        self._id = str(uuid.uuid4())
-        self._created_at = datetime.now()
-        self._updated_at = datetime.now()
-        self._name = None
-        self._places = []
-
         self.name = name
 
-
-    @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, value):
-        if not isinstance(value, str) or len(value.strip()) == 0:
-            raise TypeError("id must be a non-empty string")
-        self._id = value
-        self._touch()
-
-
-    @property
-    def created_at(self):
-        return self._created_at
-
-    @property
-    def updated_at(self):
-        return self._updated_at
-
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, value):
+    # ---------- VALIDATION ----------
+    @validates("name")
+    def validate_name(self, key, value):
         if not isinstance(value, str):
             raise TypeError("name must be a string")
         value = value.strip()
-        if not value:
+        if len(value) == 0:
             raise ValueError("name is required")
         if len(value) > 50:
             raise ValueError("name must be less than 50 characters long")
+        return value
 
-        self._name = value
-        self._touch()
-
-
-    @property
-    def places(self):
-        return self._places
-
-    def add_place(self, place):
-        from app.models.place import Place
-        if not isinstance(place, Place):
-            raise TypeError("place must be an instance of the Place class")
-        if place not in self._places:
-            self._places.append(place)
-            self._touch
-
-
-    def _touch(self):
-        self._updated_at = datetime.now()
-
+    # ---------- UPDATE ----------
     def update(self, data: dict):
-        allowed_fields = ['name']
+        allowed_fields = ["name"]
         for key, value in data.items():
             if key in allowed_fields:
                 setattr(self, key, value)

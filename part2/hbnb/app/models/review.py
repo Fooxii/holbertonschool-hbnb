@@ -1,110 +1,38 @@
-import uuid
-from datetime import datetime
-from app.models.user import User
-from app.models.place import Place
+from app import db
+from .baseclass import BaseModel
+from sqlalchemy.orm import validates
 
 
+class Review(BaseModel):
+    __tablename__ = "reviews"
 
-class Review:
-    def __init__(self, text, rating, place, user):
-        self._id = str(uuid.uuid4())
-        self._created_at = datetime.now()
-        self._updated_at = datetime.now()
-        self._text = None
-        self._rating = None
-        self._place = None
-        self._user = None
+    text = db.Column(db.String(255), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
 
+    def __init__(self, text, rating):
         self.text = text
         self.rating = rating
-        self.place = place
-        self.user = user
-        self.user.add_review(self)
 
-
-
-    @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, value):
-        if not isinstance(value, str) or len(value) == 0:
-            raise TypeError("id must be a string")
-        self._id = value
-        self._touch()
-
-
-    @property
-    def created_at(self):
-        return self._created_at
-
-    @property
-    def updated_at(self):
-        return self._updated_at
-
-
-    @property
-    def text(self):
-        return self._text
-
-    @text.setter
-    def text(self, value):
+    # ---------- VALIDATION ----------
+    @validates("text")
+    def validate_text(self, key, value):
         if not isinstance(value, str):
             raise TypeError("text must be a string")
         if len(value.strip()) == 0:
             raise ValueError("text is required")
-        self._text = value
-        self._touch()
+        return value
 
-
-    @property
-    def rating(self):
-        return self._rating
-
-    @rating.setter
-    def rating(self, value):
+    @validates("rating")
+    def validate_rating(self, key, value):
         if not isinstance(value, int):
             raise TypeError("rating must be an integer")
         if value < 1 or value > 5:
             raise ValueError("rating must be between 1 and 5")
-        self._rating = value
-        self._touch()
+        return value
 
-
-    @property
-    def place(self):
-        return self._place
-
-    @place.setter
-    def place(self, value):
-        from app.models.review import Review
-        if not isinstance(value, Place):
-            raise TypeError("place must be an instance of the Place class")
-        self._place = value
-        if self not in value.reviews:
-            value.add_review(self)
-        self._touch()
-
-
-
-    @property
-    def user(self):
-        return self._user
-
-    @user.setter
-    def user(self, value):
-        if not isinstance(value, User):
-            raise TypeError("user must be an instance of the User class")
-        self._user = value
-        self._touch()
-
-
-    def _touch(self):
-        self._updated_at = datetime.now()
-
+    # ---------- UPDATE ----------
     def update(self, data: dict):
-        allowed_fields = ['text', 'rating', 'place', 'user']
+        allowed_fields = ["text", "rating"]
         for key, value in data.items():
             if key in allowed_fields:
                 setattr(self, key, value)
