@@ -1,7 +1,6 @@
 from app import db
 from .baseclass import BaseModel
-from sqlalchemy.orm import validates
-
+from sqlalchemy.orm import relationship, validates
 
 class Place(BaseModel):
     __tablename__ = "places"
@@ -11,20 +10,28 @@ class Place(BaseModel):
     price = db.Column(db.Float, nullable=False)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
 
-    def __init__(self, title, price, latitude, longitude, description=None):
+    # Relationships
+    owner = relationship("User", back_populates="places")
+    reviews = relationship("Review", back_populates="place", cascade="all, delete-orphan")
+    amenities = relationship("Amenity", secondary="place_amenity", back_populates="places")
+
+    def __init__(self, title, price, latitude, longitude, owner, description=None):
         self.title = title
+        self.description = description
         self.price = price
         self.latitude = latitude
         self.longitude = longitude
-        self.description = description
+        self.owner = owner
 
     # ---------- VALIDATION ----------
     @validates("title")
     def validate_title(self, key, value):
         if not isinstance(value, str):
             raise TypeError("title must be a string")
-        if len(value.strip()) == 0:
+        value = value.strip()
+        if not value:
             raise ValueError("title is required")
         if len(value) > 100:
             raise ValueError("title must be less than 100 characters long")
@@ -70,7 +77,6 @@ class Place(BaseModel):
 
     # ---------- UPDATE ----------
     def update(self, data: dict):
-        allowed_fields = ["title", "description", "price", "latitude", "longitude"]
+        allowed_fields = ["title", "description", "price", "latitude", "longitude", "owner", "amenities"]
         for key, value in data.items():
-            if key in allowed_fields:
-                setattr(self, key, value)
+            setattr(self, key, value)

@@ -1,24 +1,32 @@
 from app import db
 from .baseclass import BaseModel
-from sqlalchemy.orm import validates
-
+from sqlalchemy.orm import relationship, validates
 
 class Review(BaseModel):
     __tablename__ = "reviews"
 
     text = db.Column(db.String(255), nullable=False)
     rating = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey("users.id"), nullable=False)
+    place_id = db.Column(db.String(36), db.ForeignKey("places.id"), nullable=False)
 
-    def __init__(self, text, rating):
+    # Relationships
+    author = relationship("User", back_populates="reviews")
+    place = relationship("Place", back_populates="reviews")
+
+    def __init__(self, text, rating, author, place):
         self.text = text
         self.rating = rating
+        self.author = author
+        self.place = place
 
     # ---------- VALIDATION ----------
     @validates("text")
     def validate_text(self, key, value):
         if not isinstance(value, str):
             raise TypeError("text must be a string")
-        if len(value.strip()) == 0:
+        value = value.strip()
+        if not value:
             raise ValueError("text is required")
         return value
 
@@ -32,7 +40,6 @@ class Review(BaseModel):
 
     # ---------- UPDATE ----------
     def update(self, data: dict):
-        allowed_fields = ["text", "rating"]
+        allowed_fields = ["text", "rating", "author", "place"]
         for key, value in data.items():
-            if key in allowed_fields:
-                setattr(self, key, value)
+            setattr(self, key, value)
