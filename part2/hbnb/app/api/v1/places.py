@@ -163,8 +163,12 @@ class PlaceReviewList(Resource):
                 'id': r.id,
                 'text': r.text,
                 'rating': r.rating,
-                'user_id': r.user.id,
-                'place_id': r.place.id
+                'place_id': r.place.id,
+                'author': {
+                    'id': r.author.id,
+                    'name': r.author.name,
+                    'email': r.author.email
+                } if r.author else None
             }
             for r in reviews
         ], 200

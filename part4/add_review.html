@@ -3,27 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Review</title>
+    <title>HBnB - Add Review</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image" href="images/icon.png">
 </head>
 <body>
+    <header>
+        <nav>
+            <a href="index.html">
+                <img src="images/logo.png" alt="HBnB logo">
+            </a>
+            <a href="login.html" id="login-link" class="login-button">Login</a>
+            <a href="index.html" id="logout-link" class="logout-button" style="display: none;">Logout</a>
+        </nav>
+    </header>
+    <hr>
     <main>
-        <!-- Add something to idfentify the place you're reviewing -->
+        <input type="hidden" id="place_id" value="">
+
+        <div id="place-details">
+            <!-- Container for place details -->
+        </div>
+
+        <div id="reviews">
+            <!-- Container for existing reviews -->
+        </div>
+
         <form id="review-form">
             <h2>Add a Review</h2>
-            <label for="review">Your Review:</label>
-            <textarea id="review" name="review" required></textarea>
+            <label for="review-text">Your Review:</label>
+            <textarea id="review-text" name="review" required></textarea>
             <label for="rating">Rating:</label>
             <select id="rating" name="rating" required>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
+                <option value="">Select rating</option>
+                <option value="1">1 ★</option>
+                <option value="2">2 ★</option>
+                <option value="3">3 ★</option>
+                <option value="4">4 ★</option>
+                <option value="5">5 ★</option>
             </select>
             <button type="submit">Submit Review</button>
         </form>
     </main>
+    <footer>
+        <p>All rights reserved</p>
+    </footer>
     <script src="scripts.js"></script>
 </body>
 </html>

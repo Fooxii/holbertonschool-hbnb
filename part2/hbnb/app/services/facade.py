@@ -146,6 +146,15 @@ class HBnBFacade:
         if not user:
             return []
         return user.reviews
+    
+    def get_review_by_user_and_place(self, user_id, place_id):
+        reviews = self.review_repo.get_all()
+
+        for review in reviews:
+            if review.author.id == user_id and review.place.id == place_id:
+                return review
+
+        return None
 
     def update_review(self, review_id, review_data):
         review = self.get_review(review_id)

@@ -50,7 +50,7 @@ class ReviewList(Resource):
                 'id': review.id,
                 'text': review.text,
                 'rating': review.rating,
-                'user_id': review.user.id,
+                'user_id': review.author.id,
                 'place_id': review.place.id
             }, 201
 
@@ -60,16 +60,20 @@ class ReviewList(Resource):
 
     @api.response(200, 'List of reviews retrieved successfully')
     def get(self):
-        """Retrieve a list of all reviews"""
+        """Retrieve a list of all reviews, optionally filtered by place"""
+        place_id = api.payload.get('place_id') if api.payload else None
         reviews = facade.get_all_reviews()
+
+        if place_id:
+            reviews = [r for r in reviews if r.place.id == place_id]
 
         return [
             {
                 'id': r.id,
                 'text': r.text,
                 'rating': r.rating,
-                'user_id': r.user.id,
-                'place_id': r.place.id
+                'place_id': r.place.id,
+                'author_name': r.author.name if r.author and r.author.name else "Anonymous"
             }
             for r in reviews
         ], 200
@@ -89,7 +93,7 @@ class ReviewResource(Resource):
             'id': review.id,
             'text': review.text,
             'rating': review.rating,
-            'user_id': review.user.id,
+            'user_id': review.author.id,
             'place_id': review.place.id
         }, 200
 
@@ -108,7 +112,7 @@ class ReviewResource(Resource):
 
         current_user = get_jwt_identity()
 
-        if review.user.id != current_user and not admin_required():
+        if review.author.id != current_user and not admin_required():
             return {"error": "Unauthorized action"}, 403
         try:
             updated = facade.update_review(review_id, api.payload)
@@ -132,10 +136,24 @@ class ReviewResource(Resource):
 
         current_user = get_jwt_identity()
 
-        if review.user.id != current_user and not admin_required():
+        if review.author.id != current_user and not admin_required():
             return {"error": "Unauthorized action"}, 403
         deleted = facade.delete_review(review_id)
         if not deleted:
             return {'error': 'Review not found'}, 404
 
         return {'message': 'Review deleted successfully'}, 200
+
+    @api.route('/place/<place_id>')
+    class PlaceReviewList(Resource):
+        @api.response(200, 'List of reviews for the place retrieved successfully')
+        @api.response(404, 'Place not found')
+        def get(self, place_id):
+            place = facade.get_place(place_id)
+            if not place:
+                return {'error': 'Place not found'}, 404
+
+            reviews = facade.get_reviews_by_place(place_id)
+            return [
+                r.to_dict() for r in reviews
+            ], 200

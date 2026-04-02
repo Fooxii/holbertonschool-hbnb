@@ -43,3 +43,13 @@ class Review(BaseModel):
         allowed_fields = ["text", "rating", "author", "place"]
         for key, value in data.items():
             setattr(self, key, value)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "text": self.text,
+            "rating": self.rating,
+            "place_id": self.place_id,
+
+            "author_name": self.author.email if self.author and hasattr(self.author, "email") else "Anonymous"
+        }
